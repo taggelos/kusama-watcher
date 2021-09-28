@@ -1,0 +1,45 @@
+serviceName: external-app
+
+service:
+  type: ClusterIP
+  externalPort: 8989
+  internalPort: 8989
+  #nodePort: 30889
+  annotations:
+
+endpoint:
+  address: 10.0.0.1
+  port: 44820
+
+serviceMonitor:
+  enabled: true
+  ## Scrape interval. If not set, the Prometheus default scrape interval is used.
+  interval: ""
+  path: "/metrics"
+  #scheme:
+  #scrapeTimeout:
+  #relabelings:
+  #annotations:
+  #tlsConfig:
+
+#prometheusRulesMap:
+#  kusama-watcher-rule:
+#    additionalLabels:
+#    - severity: low
+#    groups:
+#    - name: test_group
+#      rules:
+#      - alert: KusamaTest
+#        annotations:
+#          message: etcd instance {{ $labels.instance }} HTTP requests to {{ $labels.method
+#            }} are slow.
+#        expr: |-
+#          histogram_quantile(0.99, rate(etcd_http_successful_duration_seconds_bucket[5m]))
+#          > 0.15
+#        for: 10m
+#        labels:
+#          severity: warning
+
+global:
+  # define global environment variables here to use both in the templates of this chart and the dependency charts (if any dependency exists)
+  env: {}

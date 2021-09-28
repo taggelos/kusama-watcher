@@ -1,0 +1,10 @@
+apiVersion: v2
+description: NodeJs Application to observe the Kusama network
+type: application
+maintainers:
+  - name: atoumasis
+    email: toumasis.aggelos@gmail.com
+name: kusama-watcher 
+version: 0.0.1-SNAPSHOT
+appVersion: 0.0.1
+#kubeVersion: ">=1.21.0-0"
