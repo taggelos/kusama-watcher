@@ -51,15 +51,15 @@ service:
   annotations:
 livenessProbe:
   probePath: /healthcheck
-  initialDelaySeconds: 10
+  initialDelaySeconds: 20
   periodSeconds: 10
   failureThreshold: 2
   successThreshold: 1
   timeoutSeconds: 1
 readinessProbe:
-  probePath: /healthcheck
-  initialDelaySeconds: 15
-  periodSeconds: 10 
+  probePath: /metrics
+  initialDelaySeconds: 20
+  periodSeconds: 10
   failureThreshold: 2
   successThreshold: 1
   timeoutSeconds: 1
@@ -81,25 +81,26 @@ prometheusRulesMap:
 #    additionalLabels:
 #    - severity: low
     groups:
-    - name: test_group
+    - name: validators
       rules:
-      - alert: KusamaTest
+      - alert: Validator keeps being Offline 
         annotations:
-          message: etcd instance {{ $labels.instance }} HTTP requests to {{ $labels.method
-            }} are slow.
+          message: Validator {{ $labels.name }} reported offline for too long.
         expr: |-
-          histogram_quantile(0.99, rate(etcd_http_successful_duration_seconds_bucket[5m]))
-          > 0.15
+          kusama_offline_validator_session_at_least_once == 1
         for: 10m
         labels:
           severity: warning
-
-#  rule-name-2:
-#    groups:
-#    - name: second_group
-#      rules:
-#      - record: mysecrec
-#        expr: 100 * mysecrec
+  rule-name-2:
+    groups:
+    - name: active-set
+      rules:
+      - alert: 1000 validators!
+        annotations:
+          summary: this is to showcase the 1000 validators program
+        expr: kusama_num_active_set_validators_total  == 1000
+        labels:
+          severity: page
 
 global:
   # define global environment variables here to use both in the templates of this chart and the dependency charts (if any dependency exists)
