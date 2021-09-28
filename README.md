@@ -34,8 +34,6 @@ Here you can find the helmChart created for this application under <i>kusamaHelm
 This branch also consists of the values.yaml changes on the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)  chart. </br>
 Trigger the Helm chart installation/upgrade by configuring the values.yaml and running inside the folder: </br>
 ``` helm upgrade ksm-watcher . -f values.yaml ```
-</br>
-Proper alerting needs to be implemented as it creates a simple sample alert to demonstrate the ability to do so.
 </br></br>
 
 > #### wireguard branch
