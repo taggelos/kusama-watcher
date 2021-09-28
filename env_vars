@@ -1,0 +1,2 @@
+export KSM_WATCHER_VALIDATORS='["JLJhvwotxyGLwMUVjCDmA79N79e1ipVoyNYLrX5D5UFhsdR", "CzugcauySs7eZ5im4y7dgLAZzGZkXLfNCirRNGjxbNvwJyh"]'
+export KSM_WATCHER_PORT="5555"
