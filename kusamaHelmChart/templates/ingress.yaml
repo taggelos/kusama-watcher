@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: {{ .Values.deploymentName }}
+spec:
+  rules:
+  - host: {{ template "ingressurl" . }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.deploymentName }}
+          servicePort: {{ .Values.service.externalPort }}

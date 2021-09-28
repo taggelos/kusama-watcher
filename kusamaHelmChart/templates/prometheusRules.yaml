@@ -1,0 +1,22 @@
+{{- if .Values.prometheusRulesMap }}
+apiVersion: v1
+kind: List
+metadata:
+  name: {{ .Values.deploymentName }}-additional-prometheus-rules
+  release: prometheus
+items:
+{{- range $prometheusRuleName, $prometheusRule := .Values.prometheusRulesMap }}
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: {{ $prometheusRuleName }}
+      labels:
+        release: prometheus
+     {{- if $prometheusRule.additionalLabels }}
+{{ toYaml $prometheusRule.additionalLabels | indent 8 }}
+    {{- end }}
+    spec:
+      groups:
+{{ toYaml $prometheusRule.groups| indent 8 }}
+{{- end }}
+{{- end }}

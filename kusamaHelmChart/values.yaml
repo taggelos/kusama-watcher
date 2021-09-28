@@ -1,0 +1,106 @@
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+replicaCount: 1
+
+## The maxSurge and maxUnavailable are used only for RollingUpdate strategy
+strategy:
+  maxSurge: 25%
+  maxUnavailable: 25%
+  type: RollingUpdate
+
+image:
+  # This could be replaced with the repository name
+  name: ksm-watcher
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# define environment variables here as a map of key: value
+env:
+  KSM_WATCHER_VALIDATORS: '["JLJhvwotxyGLwMUVjCDmA79N79e1ipVoyNYLrX5D5UFhsdR", "CzugcauySs7eZ5im4y7dgLAZzGZkXLfNCirRNGjxbNvwJyh"]'
+  KSM_WATCHER_PORT: "8989"
+
+# Define configMap/secret env variable references.
+# Each configMapRef/secretRef is created with the name of the corresponding key.
+# Any additional attributes of the configMapRef/secretRef are inserted in the value of each key
+# (only the "optional" attribute is supported at the time of writing this template)
+deploymentEnvFrom: {}
+#deploymentEnvFrom:
+#  configMapRefs:
+#      env-vars: 'KSM_WATCHER_VALIDATORS'
+#      KSM_WATCHER_VALIDATORS: '["JLJhvwotxyGLwMUVjCDmA79N79e1ipVoyNYLrX5D5UFhsdR", "CzugcauySs7eZ5im4y7dgLAZzGZkXLfNCirRNGjxbNvwJyh"]'
+#      KSM_WATCHER_PORT: "5555"
+  # secretRefs:
+    # ldap-secrets:
+      # optional: true
+
+baseDomain: test
+
+deploymentName: kusamawatcher
+
+service:
+  type: NodePort
+  externalPort: 8989
+  internalPort: 8989
+  nodePort: 30889
+  annotations:
+livenessProbe:
+  probePath: /healthcheck
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 2
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  probePath: /healthcheck
+  initialDelaySeconds: 15
+  periodSeconds: 10 
+  failureThreshold: 2
+  successThreshold: 1
+  timeoutSeconds: 1
+terminationGracePeriodSeconds: 10
+
+serviceMonitor:
+  enabled: true
+  ## Scrape interval. If not set, the Prometheus default scrape interval is used.
+  interval: ""
+  path: "/metrics"
+  #scheme:
+  #scrapeTimeout:
+  #relabelings:
+  #annotations:
+  #tlsConfig:
+
+prometheusRulesMap:
+  kusama-watcher-rule:
+#    additionalLabels:
+#    - severity: low
+    groups:
+    - name: test_group
+      rules:
+      - alert: KusamaTest
+        annotations:
+          message: etcd instance {{ $labels.instance }} HTTP requests to {{ $labels.method
+            }} are slow.
+        expr: |-
+          histogram_quantile(0.99, rate(etcd_http_successful_duration_seconds_bucket[5m]))
+          > 0.15
+        for: 10m
+        labels:
+          severity: warning
+
+#  rule-name-2:
+#    groups:
+#    - name: second_group
+#      rules:
+#      - record: mysecrec
+#        expr: 100 * mysecrec
+
+global:
+  # define global environment variables here to use both in the templates of this chart and the dependency charts (if any dependency exists)
+  env: {}

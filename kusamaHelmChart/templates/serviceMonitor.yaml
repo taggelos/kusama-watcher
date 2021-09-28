@@ -1,0 +1,43 @@
+{{- if .Values.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.deploymentName  }}
+  labels:
+    chart: "{{ template "chartLabel" . }}"
+    release: prometheus
+  {{- if .Values.serviceMonitor.annotations }}
+    annotations:
+  {{ toYaml .Values.service.annotations | indent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+  - honorLabels: true
+    {{- if .Values.serviceMonitor.interval }}
+    interval: {{ .Values.serviceMonitor.interval }}
+    {{- end }}
+    {{- if .Values.serviceMonitor.scrapeTimeout }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+    {{- end }}
+    port: http
+    path: {{ .Values.serviceMonitor.path }}
+    {{- if .Values.serviceMonitor.tlsConfig }}
+    scheme: {{ .Values.serviceMonitor.scheme }}
+    {{- end }}
+    {{- if .Values.serviceMonitor.tlsConfig }}
+    tlsConfig:
+    {{- toYaml .Values.serviceMonitor.tlsConfig | nindent 6 }}
+    {{- end }}
+    {{- if .Values.serviceMonitor.relabelings }}
+    relabelings:
+    {{- toYaml .Values.serviceMonitor.relabelings | nindent 4 }}
+    {{- end }}
+  jobLabel: "{{ .Release.Name }}"
+  selector:
+    matchLabels:
+      service: {{ .Values.deploymentName }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
